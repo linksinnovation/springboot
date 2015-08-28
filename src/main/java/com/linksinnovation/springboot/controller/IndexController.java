@@ -8,9 +8,11 @@ package com.linksinnovation.springboot.controller;
 import com.linksinnovation.springboot.dto.Comment;
 import com.linksinnovation.springboot.service.CommentService;
 import java.util.List;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,7 +36,10 @@ public class IndexController {
     }
     
     @RequestMapping(method = RequestMethod.POST)
-    public String save(@ModelAttribute("formComment") Comment comment,Model model){
+    public String save(@Valid @ModelAttribute("formComment") Comment comment, BindingResult result,Model model){
+        if(result.hasErrors()){
+            return "index";
+        }
         List<Comment> save = commentService.save(comment);
         model.addAttribute("comments", save);
         model.addAttribute("formComment", new Comment());

@@ -15,8 +15,14 @@
 
         <form action="#" th:action="@{/}" th:object="${formComment}" method="post">
             <div>
-                Comment : <input type="text" th:field="*{comment}" />
-                Author : <input type="text" th:field="*{author}" />
+                Comment : <input type="text" th:field="*{comment}" /><br />
+                <ul th:if="${#fields.hasErrors('comment')}">
+                    <li th:each="err : ${#fields.errors('comment')}" th:text="${err}">Input is incorrect</li>
+                </ul>
+                Author : <input type="text" th:field="*{author}" /><br />
+                <ul th:if="${#fields.hasErrors('author')}">
+                    <li th:each="err : ${#fields.errors('author')}" th:text="${err}">Input is incorrect</li>
+                </ul>
                 <input type="submit" value="Save" />
             </div>
         </form>

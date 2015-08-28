@@ -165,7 +165,27 @@ public class CommentService {
         return "index";
     }
 
-### REST controller
+### Validation In thymeleaf
+
+    <div>
+        Comment : <input type="text" th:field="*{comment}" /><br />
+        <ul th:if="${#fields.hasErrors('comment')}">
+            <li th:each="err : ${#fields.errors('comment')}" th:text="${err}">Input is incorrect</li>
+        </ul>
+        Author : <input type="text" th:field="*{author}" /><br />
+        <ul th:if="${#fields.hasErrors('author')}">
+            <li th:each="err : ${#fields.errors('author')}" th:text="${err}">Input is incorrect</li>
+        </ul>
+        <input type="submit" value="Save" />
+    </div>
+
+    @RequestMapping(method = RequestMethod.POST)
+    public String save(@Valid @ModelAttribute("formComment") Comment comment, BindingResult result,Model model){
+        if(result.hasErrors()){
+            return "index";
+        }
+
+### REST controller IndexRestController.java
 
     @RestController
     @RequestMapping("/rest")
@@ -197,4 +217,47 @@ public class CommentService {
     @RequestMapping(method = RequestMethod.POST)
     public List<Comment> save(@Valid @RequestBody Comment comment){
         return commentService.save(comment);
+    }
+
+### Custom message validation
+add ValidationMessages.properties
+
+    com.linksinnovation.springboot.dto.comment.NotEmpty=comment cannot be empty
+
+    public class Comment {
+        @NotEmpty(message = "{com.linksinnovation.springboot.dto.comment.NotEmpty}")
+        private String comment;
+
+
+### Custom validator
+
+    @Target({ElementType.FIELD,ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Constraint(validatedBy = StartWithConstraintValidator.class)
+    public @interface StartWith {
+
+        public String value() default "";
+
+        public String message() default "Start with error";
+
+        public Class<?>[] groups() default {};
+
+        public Class<? extends Payload>[] payload() default {};
+    }
+
+
+    public class StartWithConstraintValidator implements ConstraintValidator<StartWith, String>{
+
+        private String value;
+
+        @Override
+        public void initialize(StartWith a) {
+            this.value = a.value();
+        }
+
+        @Override
+        public boolean isValid(String t, ConstraintValidatorContext cvc) {
+            return t.startsWith(value);
+        }
+
     }

@@ -5,6 +5,7 @@
  */
 package com.linksinnovation.springboot.dto;
 
+import com.linksinnovation.springboot.validate.StartWith;
 import org.hibernate.validator.constraints.NotEmpty;
 
 /**
@@ -12,8 +13,10 @@ import org.hibernate.validator.constraints.NotEmpty;
  * @author Jirawong Wongdokpuang <jirawong@linksinnovation.com>
  */
 public class Comment {
+    @NotEmpty(message = "{com.linksinnovation.springboot.dto.comment.NotEmpty}")
     private String comment;
-    @NotEmpty
+    @NotEmpty(message = "author can not empty")
+    @StartWith("a")
     private String author;
 
     public String getComment() {
