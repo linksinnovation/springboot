@@ -1,11 +1,24 @@
 <!DOCTYPE html>
-<html>
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
     <head>
         <title>Spring Boot</title>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
     <body>
-        <div>write content</div>
+        <div th:each="comment : ${comments}" style="border: 1px solid #333;margin: 5px;width:500px;">
+            <p th:text="${comment.comment}"></p>
+            <p style="text-align: right" th:utext="'Write by '+${comment.author}"></p>
+        </div>
+
+        <form action="#" th:action="@{/}" th:object="${formComment}" method="post">
+            <div>
+                Comment : <input type="text" th:field="*{comment}" />
+                Author : <input type="text" th:field="*{author}" />
+                <input type="submit" value="Save" />
+            </div>
+        </form>
     </body>
 </html>

@@ -69,3 +69,98 @@ add src/main/resources/templates/index.html
 add /src/main/resources/application.properties
 
     spring.thymeleaf.cache=false
+
+### Thymeleaf expression
+
+    Simple expressions:
+    Variable Expressions: ${...}
+    Selection Variable Expressions: *{...}
+    Message Expressions: #{...}
+    Link URL Expressions: @{...}
+
+http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#standard-expression-syntax
+
+### Add xml namespace to index.html
+
+    <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+    <html xmlns="http://www.w3.org/1999/xhtml"
+          xmlns:th="http://www.thymeleaf.org">
+
+### Create Form
+
+    <div th:each="comment : ${comments}" style="border: 1px solid #333;margin: 5px;width:500px;">
+        <p th:text="${comment.comment}"></p>
+        <p style="text-align: right" th:utext="'Write by '+${comment.author}"></p>
+    </div>
+
+    <form action="#" th:action="@{/}" th:object="${formComment}" method="post">
+        <div>
+            Comment : <input type="text" th:field="*{comment}" />
+            Author : <input type="text" th:field="*{author}" />
+            <input type="submit" value="Save" />
+        </div>
+    </form>
+
+## Create DTO
+
+    public class Comment {
+        private String comment;
+        private String author;
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
+
+        public String getAuthor() {
+            return author;
+        }
+
+        public void setAuthor(String author) {
+            this.author = author;
+        }
+
+
+    }
+
+# Create Service
+
+@Service
+public class CommentService {
+    
+    private static List<Comment> comments = new ArrayList<>();
+    
+    public List<Comment> get(){
+        return comments;
+    }
+    
+    public List<Comment> save(Comment comment){
+        comments.add(comment);
+        return comments;
+    }
+    
+}
+
+## update IndexController
+
+    @Autowired
+    private CommentService commentService;
+    
+    @RequestMapping(method = RequestMethod.GET)
+    public String get(Model model){
+        model.addAttribute("comments", commentService.get());
+        model.addAttribute("formComment", new Comment());
+        return "index";
+    }
+    
+    @RequestMapping(method = RequestMethod.POST)
+    public String save(@ModelAttribute("formComment") Comment comment,Model model){
+        List<Comment> save = commentService.save(comment);
+        model.addAttribute("comments", save);
+        model.addAttribute("formComment", new Comment());
+        return "index";
+    }

@@ -5,7 +5,13 @@
  */
 package com.linksinnovation.springboot.controller;
 
+import com.linksinnovation.springboot.dto.Comment;
+import com.linksinnovation.springboot.service.CommentService;
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -17,8 +23,21 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RequestMapping("/")
 public class IndexController {
     
+    @Autowired
+    private CommentService commentService;
+    
     @RequestMapping(method = RequestMethod.GET)
-    public String get(){
+    public String get(Model model){
+        model.addAttribute("comments", commentService.get());
+        model.addAttribute("formComment", new Comment());
+        return "index";
+    }
+    
+    @RequestMapping(method = RequestMethod.POST)
+    public String save(@ModelAttribute("formComment") Comment comment,Model model){
+        List<Comment> save = commentService.save(comment);
+        model.addAttribute("comments", save);
+        model.addAttribute("formComment", new Comment());
         return "index";
     }
 }
