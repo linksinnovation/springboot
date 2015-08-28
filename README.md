@@ -1,10 +1,10 @@
 #Spring Boot Application
 
-##Create Maven project from Netbeans
+###Create Maven project from Netbeans
     File -> New Project -> Categories = Maven -> Project = Java Application -> Next
     Project Name = springboot -> Finish
 
-##Add Spring Boot Dependency to pom.xml
+###Add Spring Boot Dependency to pom.xml
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -17,7 +17,7 @@
         </dependency>
     </dependencies>
 
-##Create Main Class Application.java
+###Create Main Class Application.java
 
     @SpringBootApplication
     public class Application {
@@ -26,7 +26,7 @@
         }
     }
 
-## Create First Controller IndexController.java
+### Create First Controller IndexController.java
 
     @Controller
     @RequestMapping("/")
@@ -39,14 +39,14 @@
     }
 
 
-## Add template engine Dependency in pom.xml
+### Add template engine Dependency in pom.xml
 
     <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
 
-## Add first html template
+### Add first html template
 add src/main/resources/templates/index.html
 
     <!DOCTYPE html>
@@ -61,11 +61,11 @@ add src/main/resources/templates/index.html
         </body>
     </html>
 
-## First Run
+### First Run
 
     mvn spring-boot:run
 
-## Make template reload when change add 
-
+### Make template reload when change
 add /src/main/resources/application.properties
+
     spring.thymeleaf.cache=false
