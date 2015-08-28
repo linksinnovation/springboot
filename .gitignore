@@ -1,0 +1,13 @@
+**/target
+**/.DS_Store
+**/node_modules
+**/src/main/webapp/dist/**
+**/src/main/webapp/js/**
+**/src/main/webapp/bower_components/**
+
+**/nb-configuration.xml
+**/nbactions.xml
+
+**/*.idea
+**/*.iml
+**/.h2.server.properties
