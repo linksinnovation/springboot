@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  *
  * @author Jirawong Wongdokpuang <greannetwork@gmail.com>
  */
-@ControllerAdvice()
+@ControllerAdvice
 public class MethodArgumentNotValidExceptionHandler {
 
     @ResponseBody

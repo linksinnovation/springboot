@@ -261,3 +261,27 @@ add ValidationMessages.properties
         }
 
     }
+
+
+### ExceptionHandler
+
+    @ControllerAdvice
+    public class MethodArgumentNotValidExceptionHandler {
+
+        @ResponseBody
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public Map<String, Object> handler(MethodArgumentNotValidException ex) {
+            Map<String, Object> map = new HashMap<>();
+            List<Object> list = new ArrayList<>();
+
+            for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+                Map<String, Object> mapError = new HashMap<>();
+                mapError.put("field", error.getField());
+                mapError.put("message", error.getDefaultMessage());
+                list.add(mapError);
+            }
+            map.put("errors", list);
+            return map;
+        }
+    }
