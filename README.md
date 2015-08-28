@@ -102,7 +102,7 @@ http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#standard-expressi
         </div>
     </form>
 
-## Create DTO
+### Create DTO
 
     public class Comment {
         private String comment;
@@ -127,7 +127,7 @@ http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html#standard-expressi
 
     }
 
-# Create Service
+### Create Service
 
 @Service
 public class CommentService {
@@ -145,7 +145,7 @@ public class CommentService {
     
 }
 
-## update IndexController
+### update IndexController
 
     @Autowired
     private CommentService commentService;
@@ -163,4 +163,38 @@ public class CommentService {
         model.addAttribute("comments", save);
         model.addAttribute("formComment", new Comment());
         return "index";
+    }
+
+### REST controller
+
+    @RestController
+    @RequestMapping("/rest")
+    public class IndexRestController {
+
+        @Autowired
+        private CommentService commentService;
+
+        @RequestMapping(method = RequestMethod.GET)
+        public List<Comment> get(){
+            return commentService.get();
+        }
+
+        @RequestMapping(method = RequestMethod.POST)
+        public List<Comment> save(@RequestBody Comment comment){
+            return commentService.save(comment);
+        }
+
+    }
+
+### JSR 303 Bean validation
+
+    public class Comment {
+        private String comment;
+        @NotEmpty
+        private String author;
+
+
+    @RequestMapping(method = RequestMethod.POST)
+    public List<Comment> save(@Valid @RequestBody Comment comment){
+        return commentService.save(comment);
     }

@@ -5,12 +5,15 @@
  */
 package com.linksinnovation.springboot.dto;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
 /**
  *
  * @author Jirawong Wongdokpuang <jirawong@linksinnovation.com>
  */
 public class Comment {
     private String comment;
+    @NotEmpty
     private String author;
 
     public String getComment() {
