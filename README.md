@@ -285,3 +285,302 @@ add ValidationMessages.properties
             return map;
         }
     }
+
+
+## Day 2
+### Add Spring data Dependency
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+    </dependency>
+
+### Refactoring dto to domain and add annotation
+
+    @Entity
+    public class Comment {
+        @Id
+        @GeneratedValue
+        private Integer id;
+
+### Create Repository
+
+    public interface CommentRepository extends JpaRepository<Comment, Integer>{
+
+    }
+
+http://docs.spring.io/spring-data/jpa/docs/1.4.3.RELEASE/reference/html/jpa.repositories.html
+
+### update CommentService use Repository
+
+    @Service
+    public class CommentService {
+
+        @Autowired
+        private CommentRepository commentRepository;
+
+        public List<Comment> get(){
+            return commentRepository.findAll();
+        }
+
+        public List<Comment> save(Comment comment){
+            commentRepository.save(comment);
+            return commentRepository.findAll();
+        }
+
+    }
+
+### update Comment add createDate
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createDate;
+
+    @PrePersist
+    private void insertCreateDate() {
+        if (this.createDate == null) {
+            this.createDate = new Date();
+        }
+    }
+
+### change jackson date format
+
+    spring.jackson.date-format=dd-MM-yyyy
+
+
+### Switch to Mysql Database
+
+add depencency
+
+    <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.6</version>
+    </dependency>
+
+add mysql properties
+
+    spring.datasource.driver-class-name=com.mysql.jdbc.Driver
+    spring.datasource.url=jdbc:mysql://localhost:3306/springboot
+    spring.datasource.username=root
+    spring.datasource.password=
+
+### show qeury log
+
+    spring.jpa.show_sql: true
+
+### Change Data Definition Language
+
+    #validate: validate the schema, makes no changes to the database.
+    #update: update the schema.
+    #create: creates the schema, destroying previous data.
+    #create-drop: drop the schema at the end of the session.
+
+    spring.jpa.hibernate.ddl-auto=update
+
+### Add Spring Security dependency
+
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+
+### Add username password in config
+
+    security.user.name=user
+    security.user.password=password
+
+### Create Self config for basic authen
+
+    @Configuration
+    public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http
+                    .csrf()
+                    .disable()
+                    .authorizeRequests()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                    .httpBasic();
+        }
+
+        @Autowired
+        protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+            auth
+                    .inMemoryAuthentication()
+                    .withUser("user")
+                    .password("password")
+                    .roles("USER","ADMIN");
+        }
+
+    }
+
+### Default form authen
+
+        http
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                .formLogin()
+                    .permitAll()
+                    .and()
+                .logout()
+                    .permitAll();
+
+### Custom from authen create index.html
+
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+        <head>
+            <title>Spring Security Example </title>
+        </head>
+        <body>
+            <div th:if="${param.error}">
+                Invalid username and password.
+            </div>
+            <div th:if="${param.logout}">
+                You have been logged out.
+            </div>
+            <form th:action="@{/login}" method="post">
+                <div><label> User Name : <input type="text" name="username"/> </label></div>
+                <div><label> Password: <input type="password" name="password"/> </label></div>
+                <div><input type="submit" value="Sign In"/></div>
+            </form>
+        </body>
+    </html>
+
+### Change security Config
+
+        http
+                .csrf()
+                .disable()
+                .authorizeRequests()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                .formLogin()
+                    .loginPage("/login")
+                    .permitAll()
+                    .and()
+                .logout()
+                    .permitAll();
+
+
+### Add viewController
+
+    @Configuration
+    public class MvcConfig extends WebMvcConfigurerAdapter{
+
+        @Override
+        public void addViewControllers(ViewControllerRegistry registry) {
+            registry.addViewController("/login").setViewName("login");
+        }
+
+    }
+
+
+### change from inmemory to database
+create Userdetails model
+
+    @Entity
+    public class Userdetails implements UserDetails{
+
+        @Id
+        private String username;
+        private String password;
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        @Override
+        public Collection<? extends GrantedAuthority> getAuthorities() {
+            return Collections.EMPTY_LIST;
+        }
+
+        @Override
+        public boolean isAccountNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isAccountNonLocked() {
+            return true;
+        }
+
+        @Override
+        public boolean isCredentialsNonExpired() {
+            return true;
+        }
+
+        @Override
+        public boolean isEnabled() {
+            return true;
+        }  
+    }
+
+### Create UserDetailsRepository
+
+    public interface UserDetailsRepository extends JpaRepository<Userdetails, String>{
+
+    }
+
+### Create UserDetailsService
+
+    @Service
+    public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService{
+
+        @Autowired
+        private UserDetailsRepository userDetailsRepository;
+
+        @Override
+        public UserDetails loadUserByUsername(String string) throws UsernameNotFoundException {
+            return userDetailsRepository.findOne(string);   
+        }
+
+    }
+
+
+### Change config to use Userdetailsservice
+
+    @Autowired
+    protected void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService);
+//                .inMemoryAuthentication()
+//                .withUser("user")
+//                .password("password")
+//                .roles("USER","ADMIN");
+    }
+
+### Create User to database in file data.sql
+INSERT INTO USERDETAILS(username,password) VALUES('user','password');
+
+### Secure method
+
+    @Configuration
+    @EnableWebMvcSecurity
+    @EnableGlobalMethodSecurity(securedEnabled = true,proxyTargetClass = true)
+    public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+
+then use @Secured at method in controller wanna secured it

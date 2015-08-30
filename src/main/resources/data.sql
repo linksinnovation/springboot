@@ -1,0 +1,1 @@
+INSERT INTO USERDETAILS(username,password) VALUES('user','password');

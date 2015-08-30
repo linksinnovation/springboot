@@ -5,7 +5,7 @@
  */
 package com.linksinnovation.springboot.controller;
 
-import com.linksinnovation.springboot.dto.Comment;
+import com.linksinnovation.springboot.domain.Comment;
 import com.linksinnovation.springboot.service.CommentService;
 import java.util.List;
 import javax.validation.Valid;
