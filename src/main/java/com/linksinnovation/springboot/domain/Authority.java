@@ -5,14 +5,18 @@
  */
 package com.linksinnovation.springboot.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
  *
  * @author Jirawong Wongdokpuang <jirawong@linksinnovation.com>
  */
+@Entity
 public class Authority implements GrantedAuthority{
     
+    @Id
     private String authority;
 
     @Override
