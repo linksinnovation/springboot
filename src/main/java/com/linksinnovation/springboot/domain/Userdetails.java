@@ -2,8 +2,11 @@ package com.linksinnovation.springboot.domain;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -17,6 +20,8 @@ public class Userdetails implements UserDetails{
     @Id
     private String username;
     private String password;
+    @OneToMany(fetch = FetchType.EAGER)
+    private Set<Authority> authorities;
 
     public String getUsername() {
         return username;
@@ -36,7 +41,11 @@ public class Userdetails implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.EMPTY_LIST;
+        return this.authorities;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
     @Override
